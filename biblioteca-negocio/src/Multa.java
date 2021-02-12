@@ -8,10 +8,12 @@ public class Multa {
 		
 	}
 
-	public Multa(Date fInicio, Date fFin) {
+	@SuppressWarnings("deprecation")
+	public Multa(Date fInicio) {
 		this.fInicio = fInicio;
-		this.fFin = fFin;
+		this.fFin = new Date(fInicio.getYear(),fInicio.getMonth(),fInicio.getDate() + 2);
 	}
+//	Date(int year, int month, int date
 
 	public Date getfInicio() {
 		return fInicio;
@@ -27,6 +29,11 @@ public class Multa {
 
 	public void setfFin(Date fFin) {
 		this.fFin = fFin;
+	}
+
+	@Override
+	public String toString() {
+		return "Multa [fInicio=" + fInicio + ", fFin=" + fFin + "]";
 	}
 	
 	

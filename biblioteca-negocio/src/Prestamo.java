@@ -2,8 +2,10 @@ import java.util.Date;
 
 public class Prestamo {
 	
-	private Date Inicio;
+	private Date inicio;
 	private Date fin;
+	private long nroSocio;
+	private long idLibro;
 	
 	public Prestamo() {
 		
@@ -11,19 +13,34 @@ public class Prestamo {
 	
 	
 
-	public Prestamo(Date inicio, Date fin) {
-		Inicio = inicio;
-		this.fin = fin;
+	@SuppressWarnings("deprecation")
+	public Prestamo(Date inicio,long nroSocio,long idLibro) {
+		this.inicio = inicio;
+		this.fin = new Date(inicio.getYear(),inicio.getMonth() + 1,inicio.getDate());
+		this.nroSocio = nroSocio;
+		this.idLibro = idLibro;
+	}
+
+	
+
+	public long getIdLibro() {
+		return idLibro;
+	}
+
+
+
+	public void setIdLibro(long idLibro) {
+		this.idLibro = idLibro;
 	}
 
 
 
 	public Date getInicio() {
-		return Inicio;
+		return inicio;
 	}
 
 	public void setInicio(Date inicio) {
-		Inicio = inicio;
+		this.inicio = inicio;
 	}
 
 	public Date getFin() {
@@ -33,5 +50,18 @@ public class Prestamo {
 	public void setFin(Date fin) {
 		this.fin = fin;
 	}
+
+
+
+	public long getNroSocio() {
+		return nroSocio;
+	}
+
+
+
+	public void setNroSocio(long nroSocio) {
+		this.nroSocio = nroSocio;
+	}
+	
 	
 }

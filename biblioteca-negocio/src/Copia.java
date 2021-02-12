@@ -1,25 +1,20 @@
-import java.util.Random;
 
 public class Copia {
 
 	private long id;
 	private estadoCopia estado;
 	private Libro libro;
-	private static Random numAletorio = new Random();
 	
 	public Copia(Libro libro) {
 		this.libro = libro;
-		this.estado = estadoCopia.BIBLIOTECA;
-		this.id = generatorId();
-		
+		this.estado = estadoCopia.BIBLIOTECA;		
 	}
 
-
-	private long generatorId() {
-		long n = numAletorio.nextInt(100-10+1) + 25;
-		return n;
+	public Copia(Libro libro,long id) {
+		this.libro = libro;
+		this.estado = estadoCopia.BIBLIOTECA;	
+		this.id = id;
 	}
-
 
 	public long getId() {
 		return id;
