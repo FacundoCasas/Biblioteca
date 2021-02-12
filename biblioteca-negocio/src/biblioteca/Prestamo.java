@@ -1,39 +1,24 @@
+package biblioteca;
 import java.util.Date;
 
 public class Prestamo {
 	
 	private Date inicio;
 	private Date fin;
-	private long nroSocio;
-	private long idLibro;
+	private Lector lector;
+	private Copia copia;
 	
 	public Prestamo() {
 		
 	}
-	
-	
 
 	@SuppressWarnings("deprecation")
-	public Prestamo(Date inicio,long nroSocio,long idLibro) {
+	public Prestamo(Date inicio, Lector lector, Copia copia) {
 		this.inicio = inicio;
 		this.fin = new Date(inicio.getYear(),inicio.getMonth() + 1,inicio.getDate());
-		this.nroSocio = nroSocio;
-		this.idLibro = idLibro;
+		this.lector = lector;
+		this.copia = copia;
 	}
-
-	
-
-	public long getIdLibro() {
-		return idLibro;
-	}
-
-
-
-	public void setIdLibro(long idLibro) {
-		this.idLibro = idLibro;
-	}
-
-
 
 	public Date getInicio() {
 		return inicio;
@@ -51,17 +36,24 @@ public class Prestamo {
 		this.fin = fin;
 	}
 
-
-
-	public long getNroSocio() {
-		return nroSocio;
+	public Lector getLector() {
+		return lector;
 	}
 
-
-
-	public void setNroSocio(long nroSocio) {
-		this.nroSocio = nroSocio;
+	public void setLector(Lector lector) {
+		this.lector = lector;
 	}
+
+	public Copia getCopia() {
+		return copia;
+	}
+
+	public void setCopia(Copia copia) {
+		this.copia = copia;
+	}
+
 	
+
+
 	
 }

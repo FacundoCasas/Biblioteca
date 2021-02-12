@@ -1,3 +1,4 @@
+package biblioteca;
 
 public enum estadoCopia {
 

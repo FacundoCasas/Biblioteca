@@ -1,3 +1,4 @@
+package biblioteca;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -7,17 +8,13 @@ import java.util.Set;
 public class Biblioteca {
 	
 	private Set<Libro> librosTotales;
-	private List<Prestamo> librosPrestados;
 	private List<Copia> librosStock;
-	private Set<Lector> socios;
 	static private Date hoy = new Date();
 
 	
 	public Biblioteca() {
 		librosTotales = new HashSet<Libro>();
-		librosPrestados = new ArrayList<Prestamo>();
 		librosStock = new ArrayList<Copia>();
-		socios = new HashSet<Lector>();
 	}
 	
 	
@@ -38,24 +35,27 @@ public class Biblioteca {
 		}
 	}
 	
-	public void recibirLibro(Prestamo prestamo) {
-		
+	public void recibirLibro(Copia copia,Lector lector) {
+		if (lector.buscarPrestamo(copia)) {
+			copia.setEstado(estadoCopia.BIBLIOTECA);
+		}else {
+			System.out.println("No posee la copia");
+		}				
 	}
 	
-	public boolean prestarLibro(long idCopia,long nroSocio){
-		boolean pudo = false;
-		if (nroSocio == 0) {
-			System.out.println("Esta Persona No esta Registrada");
-		}
-		else if (prestamosVencidos(nroSocio)) {
-			System.out.println("Posee Prestamos Vencidos");
-			
+	public boolean prestarLibro(Copia copia,Lector lector){
+		boolean pudo = false;		
+		if (lector.NoPuedePedir()) {
+			System.out.println("Esta Persona tiene mas de x libros");
+		}	
+		else if (prestamosVencidos(lector)) {
+			System.out.println("Posee Prestamos Vencidos");			
 		}else {
-			Prestamo nuevoPrestamo = new Prestamo(hoy,nroSocio,idCopia);
-
+			Prestamo nuevoPrestamo = new Prestamo(hoy,lector,copia);
 			//Crear Un Prestamo
-			
+			lector.getPrestamos().add(nuevoPrestamo);			
 			//ponerlo el mismo instanciado afuera en lector y en biblioteca
+			copia.setEstado(estadoCopia.PRESTADO);
 			//buscar id libro y cambiar su estado a en prestamo
 			pudo = true;
 		}
@@ -63,41 +63,26 @@ public class Biblioteca {
 	}
 	
 	
-	private boolean prestamosVencidos(long nroSocio) {
+	private boolean prestamosVencidos(Lector lector) {
 		boolean prestamosVencidos = false;
-//		Set<Lector> sociosConPrestamos = new HashSet<Lector>();
-		Set<Prestamo> prestamosPorLector = prestamosPorPersona(nroSocio);
+		List<Prestamo> prestamosPorLector = lector.getPrestamos();
 		if (prestamosPorLector.size() == 0) {
 			System.out.println("No posee prestamos");
 		}else {
 			for (Prestamo prestamo : prestamosPorLector) {
-				if (prestamo.getFin().after(hoy)) {
-					multar(nroSocio);
+				if (hoy.after(prestamo.getFin())) {
+					multar(lector);
+					prestamosVencidos = true;
 				}
 			}
-			prestamosVencidos = true;
+			
 		}		
 		return prestamosVencidos;
 	}
 	
-	private Set<Prestamo> prestamosPorPersona(long nroSocio) {
-		Set<Prestamo> prestamosPorLector = new HashSet<Prestamo>(); 
-		for (Prestamo prestamo : librosPrestados) {
-			if (prestamo.getNroSocio() == nroSocio) {
-				prestamosPorLector.add(prestamo);
-			}
-		}
-		return prestamosPorLector;
-	}
 
-	private void multar(long nroSocio) {
-		Multa multa = new Multa(hoy);
-		for (Lector socio : socios) {
-			if (socio.getNroSocio() == nroSocio) {				
-				socio.getMultas().add(multa);
-				System.out.println(multa.toString());
-			}
-		}
+	private void multar(Lector lector) {	
+		lector.getMultas().add(new Multa(hoy,lector));		
 	}
 
 
@@ -108,6 +93,26 @@ public class Biblioteca {
 
 	public static void setHoy(Date hoy) {
 		Biblioteca.hoy = hoy;
+	}
+
+
+	public Set<Libro> getLibrosTotales() {
+		return librosTotales;
+	}
+
+
+	public void setLibrosTotales(Set<Libro> librosTotales) {
+		this.librosTotales = librosTotales;
+	}
+
+
+	public List<Copia> getLibrosStock() {
+		return librosStock;
+	}
+
+
+	public void setLibrosStock(List<Copia> librosStock) {
+		this.librosStock = librosStock;
 	}
 	
 	
