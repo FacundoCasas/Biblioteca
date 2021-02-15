@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import excepciones.NoPuedePedir;
+
 public class Lector {
-	//cambiar multas a multa
-	// crear un cpnstructor entero
+
 	private long nroSocio;
 	private String nombre;
 	private String telefono;
@@ -19,28 +20,50 @@ public class Lector {
 		this.nroSocio = 0;
 		prestamos = new ArrayList<Prestamo>();
 		multas = new ArrayList<Multa>();
+	}	
+	
+	
+	
+	public Lector(long nroSocio, String nombre, String telefono, String direccion) {
+		this.nroSocio = nroSocio;
+		this.nombre = nombre;
+		this.telefono = telefono;
+		this.direccion = direccion;
+		multas = new ArrayList<Multa>();
+		prestamos = new ArrayList<Prestamo>();
+	}
+
+
+	public void listarPrestamos() {
+		for (Prestamo prestamo : prestamos) {
+			System.out.println(prestamo.toString());
+		}
 	}
 	
-	public boolean NoPuedePedir(){
+	public boolean NoPuedePedir () throws NoPuedePedir{
+		boolean puede = false;
 		multasVencidas();
-		if (multas.size() > 0 || prestamos.size() >= 3) {
-			return true;
-		}else {
-			return false;
-		}		
+		if (prestamos.size() >= 3) {
+			puede =  true;
+			throw new NoPuedePedir("Ya posee su maximo de Prestamos");
+		}else if (prestamos.size() >= 3) {
+			puede =  true;
+			throw new NoPuedePedir("Posee una Multa");
+		}
+		return puede;
 	}
 	
 	// creo que no  se  puede sacar una multa  si se recorre con un forEach
-	private void multasVencidas() {
-		for (Multa multa : multas) {
-			if (multa.getfFin().before(hoy)) {
-				multas.remove(multa);
-				System.out.println("Se desmulto :" + multa.toString());
-			}else {
-				System.out.println("No se pudo desmultar");
-			}
-		}		
-	}
+	private void multasVencidas() {	
+			for (Multa multa : multas) {
+				if (multa.getfFin().before(hoy)) {
+					multas.remove(multa);
+					System.out.println("Se desmulto :" + multa.toString());
+				}else {
+					System.out.println("No se pudo desmultar");
+				}
+			}		
+		}
 
 	
 	public Boolean buscarPrestamo(Copia copia) {
@@ -59,6 +82,21 @@ public class Lector {
 			}
 		}
 		return posee;
+	}
+	
+	//Probar en multas poner una exepcion de multa repetida y actualizada
+	public boolean actualizarMulta(Prestamo prestamo) {
+		boolean existe = false;
+		int i = 0;
+		while (multas.size() > i &&   existe == false) {
+			if (multas.get(i).getPrestamo().equals(prestamo)) {
+				multas.set(i, new Multa(multas.get(i).getLector(),prestamo));
+				existe = true;
+			}
+		i++;	
+		}
+		
+		return existe;
 	}
 
 	public List<Prestamo> getPrestamos() {

@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import excepciones.NoPuedePedir;
+
 public class Biblioteca {
 	
 	private Set<Libro> librosTotales;
@@ -43,7 +45,7 @@ public class Biblioteca {
 		}				
 	}
 	
-	public boolean prestarLibro(Copia copia,Lector lector){
+	public boolean prestarLibro(Copia copia,Lector lector) throws NoPuedePedir{
 		boolean pudo = false;		
 		if (lector.NoPuedePedir()) {
 			System.out.println("Esta Persona tiene mas de x libros");
@@ -71,7 +73,7 @@ public class Biblioteca {
 		}else {
 			for (Prestamo prestamo : prestamosPorLector) {
 				if (hoy.after(prestamo.getFin())) {
-					multar(lector);
+					multar(lector,prestamo);
 					prestamosVencidos = true;
 				}
 			}
@@ -81,8 +83,12 @@ public class Biblioteca {
 	}
 	
 
-	private void multar(Lector lector) {	
-		lector.getMultas().add(new Multa(hoy,lector));		
+	private void multar(Lector lector,Prestamo prestamo) {
+		if (lector.actualizarMulta(prestamo)) {
+			System.out.println("Execption se actualizo la multa");
+		}else {
+			lector.getMultas().add(new Multa(lector,prestamo));
+		}
 	}
 
 
