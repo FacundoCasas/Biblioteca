@@ -1,22 +1,21 @@
 package biblioteca;
 import java.util.Date;
 
+import excepciones.PrestamoNoVencido;
+
 public class Multa {
 	private Date fInicio;
 	private Date fFin;
 	private Lector lector;
 	private Prestamo prestamo;
 	
-
-	@SuppressWarnings("deprecation")
-	public Multa(Lector lector,Prestamo prestamo) {
+	public Multa(Lector lector,Prestamo prestamo) throws PrestamoNoVencido {
 		this.fInicio = prestamo.getFin();
-		this.fFin = new Date(fInicio.getYear(),fInicio.getMonth(),fInicio.getDate() + 2);
+		this.fFin = new Date(prestamo.milisegundosVencidos());
 		this.lector = lector;
 		this.prestamo = prestamo;
 	}
-
-
+	 
 	public Date getfInicio() {
 		return fInicio;
 	}
@@ -54,7 +53,7 @@ public class Multa {
 
 	@Override
 	public String toString() {
-		return "Multa [fInicio=" + fInicio + ", fFin=" + fFin + ", lector=" + lector + ", prestamo=" + prestamo + "]";
+		return "Multa [fInicio=" + fInicio + ", fFin=" + fFin + ", lector=" + lector.getNombre() + ", prestamo=" + prestamo.getCopia().getLibro().getTitulo() + prestamo.getCopia().getId() + "]";
 	}
 
 

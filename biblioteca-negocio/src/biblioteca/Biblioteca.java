@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import excepciones.NoPuedePedir;
+import excepciones.NoTieneLaCopia;
+import excepciones.PrestamoNoVencido;
 
 public class Biblioteca {
 	
@@ -37,35 +39,31 @@ public class Biblioteca {
 		}
 	}
 	
-	public void recibirLibro(Copia copia,Lector lector) {
+	public void recibirLibro(Copia copia,Lector lector) throws NoTieneLaCopia {
 		if (lector.buscarPrestamo(copia)) {
 			copia.setEstado(estadoCopia.BIBLIOTECA);
 		}else {
 			System.out.println("No posee la copia");
+			throw new NoTieneLaCopia("No posee la copia");
 		}				
 	}
 	
-	public boolean prestarLibro(Copia copia,Lector lector) throws NoPuedePedir{
+	public boolean prestarLibro(Copia copia,Lector lector) throws NoPuedePedir, PrestamoNoVencido{
 		boolean pudo = false;		
 		if (lector.NoPuedePedir()) {
-			System.out.println("Esta Persona tiene mas de x libros");
 		}	
 		else if (prestamosVencidos(lector)) {
 			System.out.println("Posee Prestamos Vencidos");			
 		}else {
-			Prestamo nuevoPrestamo = new Prestamo(hoy,lector,copia);
-			//Crear Un Prestamo
-			lector.getPrestamos().add(nuevoPrestamo);			
-			//ponerlo el mismo instanciado afuera en lector y en biblioteca
+			lector.getPrestamos().add(new Prestamo(hoy,lector,copia));			
 			copia.setEstado(estadoCopia.PRESTADO);
-			//buscar id libro y cambiar su estado a en prestamo
 			pudo = true;
 		}
 		return pudo;
 	}
 	
 	
-	private boolean prestamosVencidos(Lector lector) {
+	private boolean prestamosVencidos(Lector lector) throws PrestamoNoVencido {
 		boolean prestamosVencidos = false;
 		List<Prestamo> prestamosPorLector = lector.getPrestamos();
 		if (prestamosPorLector.size() == 0) {
@@ -83,11 +81,20 @@ public class Biblioteca {
 	}
 	
 
-	private void multar(Lector lector,Prestamo prestamo) {
+	private void multar(Lector lector,Prestamo prestamo) throws PrestamoNoVencido {
 		if (lector.actualizarMulta(prestamo)) {
-			System.out.println("Execption se actualizo la multa");
+			System.out.println("Ya poseia la multa se ha actualizado");
 		}else {
+			int i = 0;
+			Copia copiaBuscada = null;
 			lector.getMultas().add(new Multa(lector,prestamo));
+			while (librosStock.size() > i &&   copiaBuscada == null) {
+				if (librosStock.get(i).equals(prestamo.getCopia())) {
+					librosStock.get(i).setEstado(estadoCopia.RETRASO);;
+					copiaBuscada = librosStock.get(i);
+				}
+			i++;	
+			}
 		}
 	}
 

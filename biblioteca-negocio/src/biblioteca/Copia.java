@@ -48,5 +48,43 @@ public class Copia {
 
 	
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((libro == null) ? 0 : libro.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Copia other = (Copia) obj;
+		if (estado != other.estado)
+			return false;
+		if (id != other.id)
+			return false;
+		if (libro == null) {
+			if (other.libro != null)
+				return false;
+		} else if (!libro.equals(other.libro))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Copia [id=" + id + ", estado=" + estado + ", libro=" + libro + "]";
+	}
+
+	
+	
 	
 }
