@@ -1,35 +1,37 @@
 package biblioteca;
+
 import java.util.Date;
 
 import excepciones.PrestamoNoVencido;
 
 public class Prestamo {
-	
+
 	private Date inicio;
 	private Date fin;
 	private Lector lector;
 	private Copia copia;
-	
+
 	public Prestamo() {
-		
+
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public Prestamo(Date inicio, Lector lector, Copia copia) {
-		this.inicio = inicio; 
-		this.fin = new Date(inicio.getYear(),inicio.getMonth() + 1,inicio.getDate());
+		this.inicio = inicio;
+		this.fin = new Date(inicio.getYear(), inicio.getMonth() + 1, inicio.getDate());
 		this.lector = lector;
+		copia.setEstado(estadoCopia.PRESTADO);
 		this.copia = copia;
 	}
-	
+
 	public long milisegundosVencidos() throws PrestamoNoVencido {
 		long milFinal = this.fin.getTime();
 		long milHoy = new Date().getTime();
 		if (milHoy < milFinal) {
 			throw new PrestamoNoVencido("Aun no vencio el Prestamo");
-		}else {
+		} else {
 			return ((milHoy - milFinal) * 2) + milHoy;
-		}				
+		}
 	}
 
 	public Date getInicio() {
@@ -61,6 +63,7 @@ public class Prestamo {
 	}
 
 	public void setCopia(Copia copia) {
+		copia.setEstado(estadoCopia.PRESTADO);
 		this.copia = copia;
 	}
 
@@ -74,7 +77,7 @@ public class Prestamo {
 		result = prime * result + ((lector == null) ? 0 : lector.hashCode());
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -109,11 +112,8 @@ public class Prestamo {
 
 	@Override
 	public String toString() {
-		return "Prestamo [inicio=" + inicio + ", fin=" + fin + ", lector=" + lector.getNombre() + ", copia=" + copia.getLibro().getTitulo() + "" + copia.getId() + "]";
+		return "Prestamo [inicio=" + inicio + ", fin=" + fin + ", lector=" + lector.getNombre() + ", copia="
+				+ copia.getLibro().getTitulo() + "" + copia.getId() + "]";
 	}
 
-	
-	
-
-	
 }

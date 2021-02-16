@@ -5,15 +5,10 @@ public class Copia {
 	private long id;
 	private estadoCopia estado;
 	private Libro libro;
-	
-	public Copia(Libro libro) {
-		this.libro = libro;
-		this.estado = estadoCopia.BIBLIOTECA;		
-	}
 
-	public Copia(Libro libro,long id) {
+	public Copia(Libro libro, long id) {
 		this.libro = libro;
-		this.estado = estadoCopia.BIBLIOTECA;	
+		this.estado = estadoCopia.BIBLIOTECA;
 		this.id = id;
 	}
 
@@ -21,38 +16,30 @@ public class Copia {
 		return id;
 	}
 
-
 	public void setId(long id) {
 		this.id = id;
 	}
-
 
 	public estadoCopia getEstado() {
 		return estado;
 	}
 
-
 	public void setEstado(estadoCopia estado) {
 		this.estado = estado;
 	}
-
 
 	public Libro getLibro() {
 		return libro;
 	}
 
-
 	public void setLibro(Libro libro) {
 		this.libro = libro;
 	}
 
-	
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + ((libro == null) ? 0 : libro.hashCode());
 		return result;
@@ -67,8 +54,6 @@ public class Copia {
 		if (getClass() != obj.getClass())
 			return false;
 		Copia other = (Copia) obj;
-		if (estado != other.estado)
-			return false;
 		if (id != other.id)
 			return false;
 		if (libro == null) {
@@ -84,7 +69,4 @@ public class Copia {
 		return "Copia [id=" + id + ", estado=" + estado + ", libro=" + libro + "]";
 	}
 
-	
-	
-	
 }
