@@ -77,12 +77,13 @@ public class Biblioteca {
 		if (prestamosPorLector.size() == 0) {
 			System.out.println("No posee prestamos");
 		} else {
-			for (Prestamo prestamo : prestamosPorLector) {
-				if (vencido(prestamo, lector)) {
+			int i = 0;
+			while (prestamosPorLector.size() > i && prestamosVencidos == false) {
+				if (vencido(prestamosPorLector.get(i), lector)) {
 					prestamosVencidos = true;
 				}
+				i++;
 			}
-
 		}
 		return prestamosVencidos;
 	}
@@ -126,7 +127,7 @@ public class Biblioteca {
 		int i = 0;
 		Copia copiaBuscada = null;
 		while (CopiasStock.size() > i && copiaBuscada == null) {
-			if (CopiasStock.get(i).getLibro() == copia.getLibro() && CopiasStock.get(i).getId() != copia.getId()) {
+			if (CopiasStock.get(i).getLibro() == copia.getLibro() && CopiasStock.get(i).getEstado() == estadoCopia.BIBLIOTECA) {				
 				copiaBuscada = CopiasStock.get(i);
 			}
 			i++;
@@ -150,11 +151,11 @@ public class Biblioteca {
 		this.librosTotales = librosTotales;
 	}
 
-	public List<Copia> getLibrosStock() {
+	public List<Copia> getCopiasStock() {
 		return CopiasStock;
 	}
 
-	public void setLibrosStock(List<Copia> librosStock) {
+	public void setCopiasStock(List<Copia> librosStock) {
 		this.CopiasStock = librosStock;
 	}
 }

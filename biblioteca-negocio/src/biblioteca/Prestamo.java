@@ -11,10 +11,6 @@ public class Prestamo {
 	private Lector lector;
 	private Copia copia;
 
-	public Prestamo() {
-
-	}
-
 	@SuppressWarnings("deprecation")
 	public Prestamo(Date inicio, Lector lector, Copia copia) {
 		this.inicio = inicio;

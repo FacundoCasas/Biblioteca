@@ -46,37 +46,41 @@ public class Lector {
 
 	public boolean NoPuedePedir() throws NoPuedePedir {
 		boolean puede = false;
-		if (multas.size() != 0) {
-			multasVencidas();
-		}
-		if (prestamos.size() >= 3) {
+		if (multasActivas()) {
+			throw new NoPuedePedir("Posee una Multa");
+		} else if (prestamos.size() >= 3) {
 			puede = true;
 			throw new NoPuedePedir("Ya posee su maximo de Prestamos");
-		} else if (multas.size() > 0) {
-			puede = true;
-			throw new NoPuedePedir("Posee una Multa");
 		}
 		return puede;
 	}
 
-	private void multasVencidas() {
-		if (multas.size() == 1) {
+	private boolean multasActivas() {
+		boolean activa = true;
+		if (multas.size() == 0) {
+			activa = false;
+		} else if (multas.size() == 1) {
 			if (multas.get(0).getfFin().before(hoy)) {
 				System.out.println("Se desmulto :" + this.multas.remove(0).toString());
+				activa = false;
+			}
+		} else {
+			List<Multa> multasVencidas = new ArrayList<Multa>();
+			for (Multa multa : this.multas) {
+				if (multa.getfFin().before(hoy)) {
+					multasVencidas.add(multa);
+				}
+			}
+			for (Multa multa : multasVencidas) {
+				if (multa.equals(this.multas.get(0))) {
+					System.out.println("Se desmulto :" + this.multas.remove(0).toString());
+				}
+			}
+			if (multas.size() == 0) {
+				activa = false;
 			}
 		}
-		List<Multa> multasVencidas = new ArrayList<Multa>();
-		for (Multa multa : this.multas) {
-			if (multa.getfFin().before(hoy)) {
-				multasVencidas.add(multa);
-			}
-		}
-		for (Multa multa : multasVencidas) {
-			if (multa.equals(this.multas.get(0))) {
-				System.out.println("Se desmulto :" + this.multas.remove(0).toString());
-			}
-		}
-
+		return activa;
 	}
 
 	public Prestamo buscarPrestamo(Copia copia) throws NoTieneLaCopia {
