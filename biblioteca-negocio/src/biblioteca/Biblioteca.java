@@ -2,9 +2,7 @@ package biblioteca;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import excepciones.NoPuedePedir;
 import excepciones.NoTieneLaCopia;
@@ -14,91 +12,100 @@ public class Biblioteca {
 	static final estadoCopia BIBLIOTECA = estadoCopia.BIBLIOTECA;
 	static final estadoCopia PRESTADO = estadoCopia.PRESTADO;
 	static final estadoCopia RETRASO = estadoCopia.RETRASO;
-	private Set<Libro> librosTotales;
+	private List<Libro> librosTotales;
 	private List<Copia> CopiasStock;
 	static private Date hoy = new Date();
 
 	public Biblioteca() {
-		librosTotales = new HashSet<Libro>();
+		librosTotales = new ArrayList<Libro>();
 		CopiasStock = new ArrayList<Copia>();
 	}
-
+	
+	//los ids van a ser autogenerados
 	public void anadirLibro(Libro libro) {
-		librosTotales.add(libro);
-		libro.setId(librosTotales.size() + 1);
-		CopiasStock.add(new Copia(libro, (CopiasStock.size() + 1)));
+		Libro libroRepetido = libroRepetido(libro);
+		if (libroRepetido != null) {
+			Copia copiaNueva = new Copia(libro, (CopiasStock.size() + 1));
+			CopiasStock.add(copiaNueva);
+			libroRepetido.getCopias().add(copiaNueva);
+		}else {
+			libro.setLibroId(librosTotales.size() + 1);
+			Copia copiaNueva = new Copia(libro, (CopiasStock.size() + 1));
+			libro.getCopias().add(copiaNueva);
+			CopiasStock.add(copiaNueva);
+			librosTotales.add(libro);
+			
+		}
+	}
+	
+	public Libro libroRepetido(Libro libro) {
+		int i = 0;
+		Libro libroBuscado = null;
+		while (librosTotales.size() > i && libroBuscado == null) {
+			if (librosTotales.get(i).equals(libro)) {
+				libroBuscado = librosTotales.get(i);
+			}
+			i++;
+		}
+		return libroBuscado;
 	}
 
 	public void listarLibros() {
 		System.out.println("Libros");
 		for (Libro libro : librosTotales) {
-			System.out.println("Nombre :" + libro.getTitulo() + "ID:" + libro.getId());
+			System.out.println("Nombre :" + libro.getTitulo() + " ID:" + libro.getLibroId());
 		}
 		System.out.println("Copias");
 		for (Copia copia : CopiasStock) {
-			System.out.println("Nombre :" + copia.getLibro().getTitulo() + "ID:" + copia.getId());
+			System.out.println("Nombre :" + copia.getTitulo() + " ID:" + copia.getId());
 		}
 	}
-
-	public void recibirLibro(Copia copia, Lector lector) throws NoTieneLaCopia, PrestamoNoVencido {
-		Prestamo prestamoRecibido = lector.buscarPrestamo(copia);
-		if (prestamoRecibido != null) {
-			Copia copiaEnBib = buscadorCopiaEnBib(prestamoRecibido.getCopia());
+	
+	public void recibirLibro(Prestamo prestamo, Lector lector) throws NoTieneLaCopia, PrestamoNoVencido {
+		if (prestamo != null) {
+			Copia copiaEnBib = buscadorCopiaEnBib(prestamo.getCopia());
 			if (copiaEnBib == null) {
-				throw new NoTieneLaCopia("Ese libro no es de esta biblioteca");
+				throw new NoTieneLaCopia("Ese libro no pertenece a esta biblioteca");
 			}
+			lector.getPrestamos().remove(prestamo);
 			estadoCopia(copiaEnBib, estadoCopia.BIBLIOTECA);
-			if (vencido(prestamoRecibido, lector)) {
-				multar(lector, prestamoRecibido, copiaEnBib);
-				System.out.println("Tiene un prestamo vencido");
+			if (vencido(prestamo.getFin())) {
+				multar(lector, prestamo);
 			}
 		}
 	}
 	
-	public boolean prestarLibro(Copia copia, Lector lector) throws NoPuedePedir, PrestamoNoVencido, NoTieneLaCopia {
+	public boolean prestarLibro(Libro libro, Lector lector) throws NoPuedePedir, PrestamoNoVencido, NoTieneLaCopia {
 		boolean pudo = false;
-		Copia copiaEnBib = buscadorCopiaDisponible(copia);
+		Copia copiaEnBib = buscadorCopiaDisponible(libro.getCopias().get(0));
 		if (lector.NoPuedePedir()) {
 		} else if (copiaEnBib == null) {
 			throw new NoTieneLaCopia("Ese libro no esta Disponible");
-		} else if (TienePrestamosVencidos(lector)) {
-			System.out.println("Posee Prestamos Vencidos");
 		} else {
-			lector.getPrestamos().add(new Prestamo(hoy, lector, copia));
+			lector.getPrestamos().add(new Prestamo(hoy, lector, copiaEnBib));
 			estadoCopia(copiaEnBib, estadoCopia.PRESTADO);
 			pudo = true;
 		}
 		return pudo;
 	}
-
-	private boolean TienePrestamosVencidos(Lector lector) throws PrestamoNoVencido {
-		boolean prestamosVencidos = false;
-		List<Prestamo> prestamosPorLector = lector.getPrestamos();
-		if (prestamosPorLector.size() == 0) {
-			System.out.println("No posee prestamos");
-		} else {
-			int i = 0;
-			while (prestamosPorLector.size() > i && prestamosVencidos == false) {
-				if (vencido(prestamosPorLector.get(i), lector)) {
-					prestamosVencidos = true;
-				}
-				i++;
-			}
-		}
-		return prestamosVencidos;
-	}
-
-	private boolean vencido(Prestamo prestamo, Lector lector) throws PrestamoNoVencido {
+	
+//	private void cambiarEstadosDeCopias(List<Copia> copias,estadoCopia estado) {
+//		for (Copia copia : copias) {	
+//			estadoCopia(buscadorCopiaEnBib(copia), estado);
+//		}				
+//	}
+	
+	private boolean vencido(Date fin) {
 		Boolean vencido = false;
-		if (hoy.after(prestamo.getFin())) {
+		if (hoy.after(fin)) {
 			vencido = true;
 		}
 		return vencido;
 	}
 
-	private void multar(Lector lector, Prestamo prestamo, Copia copiaEnBib) throws PrestamoNoVencido {
+	private void multar(Lector lector, Prestamo prestamo) throws PrestamoNoVencido {
 		lector.getMultas().add(new Multa(lector, prestamo));
-		estadoCopia(copiaEnBib, RETRASO);
+		System.out.println("Se multo al lector " + lector.getNombre());
 	}
 
 	private void estadoCopia(Copia copia, estadoCopia estado) {
@@ -106,9 +113,7 @@ public class Biblioteca {
 			copia.setEstado(estado);
 		} else if (estado == PRESTADO) {
 			copia.setEstado(estado);
-		} else if (estado == RETRASO) {
-			copia.setEstado(estado);
-		}
+		} 
 	}
 
 	public Copia buscadorCopiaEnBib(Copia copia) {
@@ -127,7 +132,7 @@ public class Biblioteca {
 		int i = 0;
 		Copia copiaBuscada = null;
 		while (CopiasStock.size() > i && copiaBuscada == null) {
-			if (CopiasStock.get(i).getLibro() == copia.getLibro() && CopiasStock.get(i).getEstado() == estadoCopia.BIBLIOTECA) {				
+			if (CopiasStock.get(i).equals(copia) && CopiasStock.get(i).getEstado() == estadoCopia.BIBLIOTECA) {
 				copiaBuscada = CopiasStock.get(i);
 			}
 			i++;
@@ -143,11 +148,11 @@ public class Biblioteca {
 		Biblioteca.hoy = hoy;
 	}
 
-	public Set<Libro> getLibrosTotales() {
+	public List<Libro> getLibrosTotales() {
 		return librosTotales;
 	}
 
-	public void setLibrosTotales(Set<Libro> librosTotales) {
+	public void setLibrosTotales(List<Libro> librosTotales) {
 		this.librosTotales = librosTotales;
 	}
 
@@ -159,3 +164,5 @@ public class Biblioteca {
 		this.CopiasStock = librosStock;
 	}
 }
+
+

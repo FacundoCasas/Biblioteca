@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import excepciones.NoPuedePedir;
-import excepciones.NoTieneLaCopia;
+import excepciones.PrestamoNoVencido;
 
 public class Lector {
 
@@ -16,7 +16,7 @@ public class Lector {
 	private List<Prestamo> prestamos;
 	private List<Multa> multas;
 	static private Date hoy = new Date();
-
+	
 	public Lector() {
 		this.nroSocio = 0;
 		prestamos = new ArrayList<Prestamo>();
@@ -43,63 +43,64 @@ public class Lector {
 			System.out.println(multa.toString());
 		}
 	}
-
-	public boolean NoPuedePedir() throws NoPuedePedir {
+	
+	public boolean NoPuedePedir() throws NoPuedePedir, PrestamoNoVencido {
 		boolean puede = false;
-		if (multasActivas()) {
+		desmultar();
+		if (multas.size() != 0) {
+//			puede = true;
 			throw new NoPuedePedir("Posee una Multa");
+		} else if (PrestamosVencidos()) {
+//			puede = true;
 		} else if (prestamos.size() >= 3) {
-			puede = true;
+//			puede = true;
 			throw new NoPuedePedir("Ya posee su maximo de Prestamos");
 		}
 		return puede;
 	}
-
-	private boolean multasActivas() {
-		boolean activa = true;
-		if (multas.size() == 0) {
-			activa = false;
-		} else if (multas.size() == 1) {
-			if (multas.get(0).getfFin().before(hoy)) {
-				System.out.println("Se desmulto :" + this.multas.remove(0).toString());
-				activa = false;
-			}
-		} else {
-			List<Multa> multasVencidas = new ArrayList<Multa>();
-			for (Multa multa : this.multas) {
-				if (multa.getfFin().before(hoy)) {
-					multasVencidas.add(multa);
-				}
-			}
-			for (Multa multa : multasVencidas) {
-				if (multa.equals(this.multas.get(0))) {
-					System.out.println("Se desmulto :" + this.multas.remove(0).toString());
-				}
-			}
-			if (multas.size() == 0) {
-				activa = false;
-			}
-		}
-		return activa;
-	}
-
-	public Prestamo buscarPrestamo(Copia copia) throws NoTieneLaCopia {
-		Prestamo prestamoBuscado = null;
+	
+	private boolean PrestamosVencidos() throws PrestamoNoVencido {
+		boolean poseePrestamosVencidos = false;
 		if (prestamos.size() == 0) {
-			throw new NoTieneLaCopia(nombre + " no tiene un prestamo con la Copia");
+			System.out.println("No posee prestamos");
 		} else {
-			int i = 0;
-			while (prestamos.size() > i && prestamoBuscado == null) {
-				if (prestamos.get(i).getCopia().equals(copia)) {
-					prestamoBuscado = prestamos.get(i);
-					System.out.println("Se devolvio La copia:" + prestamos.get(i).getCopia().toString());
-					prestamos.remove(prestamos.get(i));
+			for (Prestamo prestamo : prestamos) {
+				if (vencido(prestamo.getFin())) {
+					poseePrestamosVencidos = true;
+					throw new PrestamoNoVencido("Este Pretamo Esta Vencido: " + prestamo.toString());
 				}
-				i++;
 			}
 		}
-		return prestamoBuscado;
+		return poseePrestamosVencidos;
 	}
+	
+	private void desmultar() {
+		int numeroDeMultas = multas.size();
+		if (numeroDeMultas == 1) {
+			if (vencido(multas.get(0).getfFin())) {
+				System.out.println("Se desmulto :" + this.multas.remove(0).toString());
+			}
+		}else if (numeroDeMultas > 1) {
+			 for(int i=0;i< multas.size();i++){
+				 if (vencido(multas.get(i).getfFin())) {
+						System.out.println("Se desmulto :" + this.multas.remove(i).toString());
+						i--;
+					}
+			}
+		}
+		
+	}
+	
+	
+	
+	private boolean vencido(Date fin) {
+		Boolean vencido = false;
+		if (hoy.after(fin)) {
+			vencido = true;
+		}
+		return vencido;
+	}
+	
 
 	public List<Prestamo> getPrestamos() {
 		return prestamos;

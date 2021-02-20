@@ -1,16 +1,18 @@
 package biblioteca;
 
-public class Copia {
+public class Copia extends Libro{
 
 	private long id;
 	private estadoCopia estado;
-	private Libro libro;
+	private long libroId;
 
 	public Copia(Libro libro, long id) {
-		this.libro = libro;
+		super(libro.getTitulo(), libro.getTipo(), libro.getEditioral(), libro.getAnio(), libro.getAutor());
+		this.libroId = libro.getLibroId();
 		this.estado = estadoCopia.BIBLIOTECA;
 		this.id = id;
 	}
+	
 
 	public long getId() {
 		return id;
@@ -28,20 +30,19 @@ public class Copia {
 		this.estado = estado;
 	}
 
-	public Libro getLibro() {
-		return libro;
+	public long getLibro() {
+		return libroId;
 	}
 
-	public void setLibro(Libro libro) {
-		this.libro = libro;
+	public void setLibro(long libroId) {
+		this.libroId = libroId;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		result = prime * result + ((libro == null) ? 0 : libro.hashCode());
+		int result = super.hashCode();
+		result = prime * result + (int) (libroId ^ (libroId >>> 32));
 		return result;
 	}
 
@@ -49,24 +50,24 @@ public class Copia {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (!super.equals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		Copia other = (Copia) obj;
-		if (id != other.id)
-			return false;
-		if (libro == null) {
-			if (other.libro != null)
-				return false;
-		} else if (!libro.equals(other.libro))
+		if (libroId != other.libroId)
 			return false;
 		return true;
 	}
 
+
 	@Override
 	public String toString() {
-		return "Copia [id=" + id + ", estado=" + estado + ", libro=" + libro + "]";
+		return "Copia [id=" + id + ", estado=" + estado + ", libroId=" + libroId + ", Libro()=" + super.toString()
+				+ "]";
 	}
+
+
+	
 
 }

@@ -109,7 +109,7 @@ public class Prestamo {
 	@Override
 	public String toString() {
 		return "Prestamo [inicio=" + inicio + ", fin=" + fin + ", lector=" + lector.getNombre() + ", copia="
-				+ copia.getLibro().getTitulo() + "" + copia.getId() + "]";
+				+ copia.getTitulo() + "" + copia.getId() + "]";
 	}
 
 }

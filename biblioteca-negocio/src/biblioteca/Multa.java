@@ -50,11 +50,12 @@ public class Multa {
 		prestamo.getCopia().setEstado(estadoCopia.RETRASO);
 		this.prestamo = prestamo;
 	}
-
+	
+	
 	@Override
 	public String toString() {
 		return "Multa [fInicio=" + fInicio + ", fFin=" + fFin + ", lector=" + lector.getNombre() + ", prestamo="
-				+ prestamo.getCopia().getLibro().getTitulo() + prestamo.getCopia().getId() + "]";
+				+ prestamo.getCopia().getTitulo() + prestamo.getCopia().getId() + "]";
 	}
 
 }
